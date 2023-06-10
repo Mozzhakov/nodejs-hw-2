@@ -22,7 +22,7 @@ const getById = async (req, res, next) => {
 
 const add = async (req, res, next) => {
   const contact = await contacts.addContact(req.body);
-  res.status(201).json({ contact, message: "Successfully created" });
+  res.status(201).json(contact);
 };
 
 const removeById = async (req, res, next) => {
@@ -31,19 +31,16 @@ const removeById = async (req, res, next) => {
   if (!contact) {
     throw HttpError(404, "Not found");
   }
-  res.status(200).json({ contact, message: "Contact deleted" });
+  res.status(200).json({ message: "Contact deleted" });
 };
 
 const updateById = async (req, res, next) => {
   const { contactId } = req.params;
-  if (Object.keys(req.body).length === 0) {
-    throw HttpError(400, "Missing fields");
-  }
   const contact = await contacts.updateContact(contactId, req.body);
   if (!contact) {
     throw HttpError(404, "Not found");
   }
-  res.status(200).json({ contact, message: "Successfully changed" });
+  res.status(200).json(contact);
 };
 
 module.exports = {
