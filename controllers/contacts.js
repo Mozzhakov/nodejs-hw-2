@@ -1,19 +1,15 @@
-const contacts = require("../models/contacts");
-
+const { Contact } = require("../models/contact");
 const { HttpError } = require("../helpers");
-
-// const { schema } = require("../schemas");
-
 const { ctrlWrapper } = require("../helpers");
 
 const getAll = async (req, res, next) => {
-  const allContacts = await contacts.listContacts();
+  const allContacts = await Contact.find();
   res.status(200).json(allContacts);
 };
 
 const getById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await contacts.getContactById(contactId);
+  const contact = await Contact.findOne({ _id: contactId });
   if (!contact) {
     throw HttpError(404, "Not found");
   }
@@ -21,13 +17,13 @@ const getById = async (req, res, next) => {
 };
 
 const add = async (req, res, next) => {
-  const contact = await contacts.addContact(req.body);
+  const contact = await Contact.create(req.body);
   res.status(201).json(contact);
 };
 
 const removeById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await contacts.removeContact(contactId);
+  const contact = await Contact.findByIdAndRemove(contactId);
   if (!contact) {
     throw HttpError(404, "Not found");
   }
@@ -36,7 +32,21 @@ const removeById = async (req, res, next) => {
 
 const updateById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await contacts.updateContact(contactId, req.body);
+  console.log(req.body)
+  const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+  if (!contact) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json(contact);
+};
+
+const updateStatusById = async (req, res, next) => {
+  const { contactId } = req.params;
+  const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
   if (!contact) {
     throw HttpError(404, "Not found");
   }
@@ -49,4 +59,5 @@ module.exports = {
   add: ctrlWrapper(add),
   removeById: ctrlWrapper(removeById),
   updateById: ctrlWrapper(updateById),
+  updateStatusById: ctrlWrapper(updateStatusById),
 };
